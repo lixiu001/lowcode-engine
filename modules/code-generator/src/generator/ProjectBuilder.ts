@@ -125,12 +125,14 @@ export class ProjectBuilder implements IProjectBuilder {
     if (!schemaParser.validate(schema)) {
       throw new CodeGeneratorError('Schema is invalid');
     }
+    // console.log(`1.1 schema==== ${JSON.stringify(schema, null, 2)}`);
 
     // Collect Deps
     // Parse JSExpression
     const parseResult: IParseResult = schemaParser.parse(schema);
-
+    // console.log(`1.2 parseResult==== ${JSON.stringify(parseResult, null, 2)}`);
     const projectRoot = await this.template.generateTemplate(parseResult);
+    // console.log(`1.3 projectRoot==== ${JSON.stringify(projectRoot, null, 2)}`);
 
     let buildResult: IModuleInfo[] = [];
 
@@ -140,6 +142,7 @@ export class ProjectBuilder implements IProjectBuilder {
         template: this.template,
       },
     });
+    //  console.log(`1.4 builders==== ${JSON.stringify(builders, null, 2)}`);
     // Generator Code module
     // components
     // pages
@@ -149,134 +152,137 @@ export class ProjectBuilder implements IProjectBuilder {
         let path: string[];
         if (containerInfo.containerType === 'Page') {
           builder = builders.pages;
-          path = this.template.slots.pages.path;
+          path = this.template.slots.pages.path; //  path: ['src', 'pages'],
         } else {
-          builder = builders.components;
-          path = this.template.slots.components.path;
+          builder = builders.components; // 
+          path = this.template.slots.components.path; //  path: ['src', 'components'],
         }
 
+        // console.log(`builder==== ${JSON.stringify(builder.generateModule, null, 2)}`);
         const { files } = await builder.generateModule(containerInfo);
-
+        //  console.log(`files==== ${JSON.stringify(files, null, 2)}`);
         return {
-          moduleName: containerInfo.moduleName,
-          path,
+          moduleName: containerInfo.moduleName, //  "moduleName": "Test",
+          path, //  path: ['src', 'pages'],
           files,
         };
       }),
     );
+    // console.log(`1.5 containerBuildResult==== ${JSON.stringify(containerBuildResult, null, 2)}`);
     buildResult = buildResult.concat(containerBuildResult);
+    // console.log(`1.6 buildResult==== ${JSON.stringify(buildResult, null, 2)}`);
 
     // router
-    if (parseResult.globalRouter && builders.router) {
-      const { files } = await builders.router.generateModule(parseResult.globalRouter);
+    // if (parseResult.globalRouter && builders.router) {
+    //   const { files } = await builders.router.generateModule(parseResult.globalRouter);
 
-      buildResult.push({
-        path: this.template.slots.router.path,
-        files,
-      });
-    }
+    //   buildResult.push({
+    //     path: this.template.slots.router.path,
+    //     files,
+    //   });
+    // }
 
     // entry
-    if (parseResult.project && builders.entry) {
-      const { files } = await builders.entry.generateModule(parseResult.project);
+    // if (parseResult.project && builders.entry) {
+    //   const { files } = await builders.entry.generateModule(parseResult.project);
 
-      buildResult.push({
-        path: this.template.slots.entry.path,
-        files,
-      });
-    }
+    //   buildResult.push({
+    //     path: this.template.slots.entry.path,
+    //     files,
+    //   });
+    // }
 
     // appConfig
-    if (builders.appConfig) {
-      const { files } = await builders.appConfig.generateModule(parseResult);
+    // if (builders.appConfig) {
+    //   const { files } = await builders.appConfig.generateModule(parseResult);
 
-      buildResult.push({
-        path: this.template.slots.appConfig.path,
-        files,
-      });
-    }
+    //   buildResult.push({
+    //     path: this.template.slots.appConfig.path,
+    //     files,
+    //   });
+    // }
 
     // buildConfig
-    if (builders.buildConfig) {
-      const { files } = await builders.buildConfig.generateModule(parseResult);
+    // if (builders.buildConfig) {
+    //   const { files } = await builders.buildConfig.generateModule(parseResult);
 
-      buildResult.push({
-        path: this.template.slots.buildConfig.path,
-        files,
-      });
-    }
+    //   buildResult.push({
+    //     path: this.template.slots.buildConfig.path,
+    //     files,
+    //   });
+    // }
 
     // constants?
-    if (parseResult.project && builders.constants && this.template.slots.constants) {
-      const { files } = await builders.constants.generateModule(parseResult.project);
+    // if (parseResult.project && builders.constants && this.template.slots.constants) {
+    //   const { files } = await builders.constants.generateModule(parseResult.project);
 
-      buildResult.push({
-        path: this.template.slots.constants.path,
-        files,
-      });
-    }
+    //   buildResult.push({
+    //     path: this.template.slots.constants.path,
+    //     files,
+    //   });
+    // }
 
     // utils?
-    if (parseResult.globalUtils && builders.utils && this.template.slots.utils) {
-      const { files } = await builders.utils.generateModule(parseResult.globalUtils);
+    // if (parseResult.globalUtils && builders.utils && this.template.slots.utils) {
+    //   const { files } = await builders.utils.generateModule(parseResult.globalUtils);
 
-      buildResult.push({
-        path: this.template.slots.utils.path,
-        files,
-      });
-    }
+    //   buildResult.push({
+    //     path: this.template.slots.utils.path,
+    //     files,
+    //   });
+    // }
 
     // i18n?
-    if (builders.i18n && this.template.slots.i18n) {
-      const { files } = await builders.i18n.generateModule(parseResult.project);
+    // if (builders.i18n && this.template.slots.i18n) {
+    //   const { files } = await builders.i18n.generateModule(parseResult.project);
 
-      buildResult.push({
-        path: this.template.slots.i18n.path,
-        files,
-      });
-    }
+    //   buildResult.push({
+    //     path: this.template.slots.i18n.path,
+    //     files,
+    //   });
+    // }
 
     // globalStyle
-    if (parseResult.project && builders.globalStyle) {
-      const { files } = await builders.globalStyle.generateModule(parseResult.project);
+    // if (parseResult.project && builders.globalStyle) {
+    //   const { files } = await builders.globalStyle.generateModule(parseResult.project);
 
-      buildResult.push({
-        path: this.template.slots.globalStyle.path,
-        files,
-      });
-    }
+    //   buildResult.push({
+    //     path: this.template.slots.globalStyle.path,
+    //     files,
+    //   });
+    // }
 
     // htmlEntry
-    if (parseResult.project && builders.htmlEntry) {
-      const { files } = await builders.htmlEntry.generateModule(parseResult.project);
+    // if (parseResult.project && builders.htmlEntry) {
+    //   const { files } = await builders.htmlEntry.generateModule(parseResult.project);
 
-      buildResult.push({
-        path: this.template.slots.htmlEntry.path,
-        files,
-      });
-    }
+    //   buildResult.push({
+    //     path: this.template.slots.htmlEntry.path,
+    //     files,
+    //   });
+    // }
 
     // packageJSON
-    if (parseResult.project && builders.packageJSON) {
-      const { files } = await builders.packageJSON.generateModule(parseResult.project);
+    // if (parseResult.project && builders.packageJSON) {
+    //   const { files } = await builders.packageJSON.generateModule(parseResult.project);
 
-      buildResult.push({
-        path: this.template.slots.packageJSON.path,
-        files,
-      });
-    }
+    //   buildResult.push({
+    //     path: this.template.slots.packageJSON.path,
+    //     files,
+    //   });
+    // }
 
     // demo
-    if (parseResult.project && builders.demo) {
-      const { files } = await builders.demo.generateModule(parseResult.project);
-      buildResult.push({
-        path: this.template.slots.demo.path,
-        files,
-      });
-    }
+    // if (parseResult.project && builders.demo) {
+    //   const { files } = await builders.demo.generateModule(parseResult.project);
+    //   buildResult.push({
+    //     path: this.template.slots.demo.path,
+    //     files,
+    //   });
+    // }
 
     // handle extra slots
-    await this.generateExtraSlots(builders, parseResult, buildResult);
+    // await this.generateExtraSlots(builders, parseResult, buildResult);
 
     // Post Process
     const isSingleComponent = parseResult?.project?.projectRemark?.isSingleComponent;
@@ -301,6 +307,7 @@ export class ProjectBuilder implements IProjectBuilder {
         parseResult,
       });
     }
+    //  console.log(`1.7 finalResult==== ${JSON.stringify(finalResult, null, 2)}`);
 
     return finalResult;
   }
@@ -308,10 +315,13 @@ export class ProjectBuilder implements IProjectBuilder {
   private createModuleBuilders(extraContextData: Record<string, unknown> = {}):
     Record<string, IModuleBuilder> {
     const builders: Record<string, IModuleBuilder> = {};
+    //  console.log(`plugins==== ${JSON.stringify(this.plugins, null, 2)}`);
 
     Object.keys(this.plugins).forEach((pluginName) => {
       if (this.plugins[pluginName].length > 0) {
+        // console.log(` this.postProcessors==== ${JSON.stringify( this.postProcessors, null, 2)}`);
         const options: { mainFileName?: string } = {};
+        // routes、app、constants、utils、i18n、global、（public）index、package
         if (this.template.slots[pluginName] && this.template.slots[pluginName].fileName) {
           options.mainFileName = this.template.slots[pluginName].fileName;
         }
@@ -328,6 +338,7 @@ export class ProjectBuilder implements IProjectBuilder {
           },
           ...options,
         });
+        //  console.log(` builders[pluginName]==== ${JSON.stringify( builders[pluginName], null, 2)}`);
       }
     });
 

@@ -145,6 +145,7 @@ const pluginFactory: BuilderComponentPluginFactory<PluginConfig> = (config?) => 
         .join('\n'),
       linkAfter: [COMMON_CHUNK_NAME.FileExport],
     });
+    // console.log(`next==== ${JSON.stringify(next, null, 2)}`);
     return next;
   };
   return plugin;

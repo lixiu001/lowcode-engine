@@ -57,7 +57,7 @@ const pluginFactory: BuilderComponentPluginFactory<PluginConfig> = (config?) => 
       });
     }
     // TODO: hooks state??
-
+    // console.log(`next==== ${JSON.stringify(next, null, 2)}`);
     return next;
   };
   return plugin;

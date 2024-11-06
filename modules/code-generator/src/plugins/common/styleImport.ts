@@ -54,10 +54,9 @@ const pluginFactory: BuilderComponentPluginFactory<unknown> = () => {
         }
       });
     }
-
+    // console.log(`next==== ${JSON.stringify(next, null, 2)}`);
     return next;
   };
-
   return plugin;
 };
 

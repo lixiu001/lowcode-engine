@@ -136,7 +136,7 @@ const pluginFactory: BuilderComponentPluginFactory<PluginConfig> = (config?) => 
       `,
       linkAfter: [RAX_CHUNK_NAME.ClassRenderEnd],
     });
-
+    // console.log(`next==== ${JSON.stringify(next, null, 2)}`);
     return next;
   };
   return plugin;

@@ -116,7 +116,7 @@ const pluginFactory: BuilderComponentPluginFactory<PluginConfig> = (config?) => 
         linkAfter: [...DEFAULT_LINK_AFTER[CLASS_DEFINE_CHUNK_NAME.InsMethod]],
       });
     }
-
+    // console.log(`next==== ${JSON.stringify(next, null, 2)}`);
     return next;
   };
   return plugin;

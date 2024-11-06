@@ -34,7 +34,9 @@ export function createModuleBuilder(
   const linker = new CodeBuilder();
 
   const generateModule = async (input: unknown): Promise<ICompiledModule> => {
-    const moduleMainName = options.mainFileName || COMMON_SUB_MODULE_NAME;
+    const moduleMainName = options.mainFileName || COMMON_SUB_MODULE_NAME; 
+    // moduleMainName： "index"
+    // console.log(`input ${JSON.stringify(input, null, 2)}`);
     if (chunkGenerator.getPlugins().length <= 0) {
       throw new CodeGeneratorError(
         'No plugins found. Component generation cannot work without any plugins!',
@@ -49,6 +51,8 @@ export function createModuleBuilder(
       depNames: [],
       contextData: options.contextData || {},
     });
+    
+    // console.log(`chunks==== ${JSON.stringify(chunks, null, 2)}`);
 
     chunks.forEach((fileChunkList) => {
       const content = linker.link(fileChunkList);
@@ -59,7 +63,8 @@ export function createModuleBuilder(
       );
       files.push(file);
     });
-
+    //  console.log(`files1==== ${JSON.stringify(files, null, 2)}`);
+    
     if (options.postProcessors.length > 0) {
       files = files.map((file) => {
         let { content, ext: type, name } = file;
@@ -70,6 +75,9 @@ export function createModuleBuilder(
         return createResultFile(file.name, type, content);
       });
     }
+
+    console.log(`files==== ${JSON.stringify(files, null, 2)}`);
+
 
     return {
       files,

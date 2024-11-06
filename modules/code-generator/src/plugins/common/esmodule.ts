@@ -22,6 +22,17 @@ import { isValidIdentifier } from '../../utils/validate';
 const DEP_MAIN_BLOCKLIST = ['lib', 'lib/index', 'es', 'es/index', 'main'];
 const DEFAULT_EXPORT_NAME = '__default__';
 
+
+/**
+ * 按包对依赖进行分组
+ *
+ * @param deps 依赖列表
+ * @returns 分组后的依赖记录
+ */
+// 根据依赖项（dependencies）的类型（内部或外部）和相关信息，
+// 将它们分组并存储在一个记录（Record）中，
+// 这个记录的键（key）是字符串类型，
+// 表示依赖包的标识符，值（value）是相同类型依赖项的数组。
 function groupDepsByPack(deps: IDependency[]): Record<string, IDependency[]> {
   const depMap: Record<string, IDependency[]> = {};
 
@@ -33,6 +44,8 @@ function groupDepsByPack(deps: IDependency[]): Record<string, IDependency[]> {
   };
 
   deps.forEach((dep) => {
+    // console.log('dep===',dep)
+    // 内部依赖
     if (dep.dependencyType === DependencyType.Internal) {
       addDep(`${(dep as IInternalDependency).moduleName}${dep.main ? `/${dep.main}` : ''}`, dep);
     } else {
@@ -47,6 +60,7 @@ function groupDepsByPack(deps: IDependency[]): Record<string, IDependency[]> {
       addDep(`${(dep as IExternalDependency).package}${depMain ? `/${depMain}` : ''}`, dep);
     }
   });
+  // console.log('depMap===',depMap)
 
   return depMap;
 }
@@ -92,8 +106,8 @@ function getExportNameOfDep(dep: IDependency): string {
     dep.exportName ||
     `__$${camelCase(
       get(dep, 'moduleName') ||
-        get(dep, 'package') ||
-        throwNewError('dep.moduleName or dep.package is undefined'),
+      get(dep, 'package') ||
+      throwNewError('dep.moduleName or dep.package is undefined'),
     )}_default`
   );
 }
@@ -102,6 +116,16 @@ function throwNewError(msg: string): never {
   throw new Error(msg);
 }
 
+
+/**
+ * 根据包名、依赖项、目标文件类型和是否使用别名生成导入代码块数组
+ *
+ * @param pkg 包名
+ * @param deps 依赖项数组
+ * @param targetFileType 目标文件类型
+ * @param useAliasName 是否使用别名
+ * @returns 导入代码块数组
+ */
 function buildPackageImport(
   pkg: string,
   deps: IDependency[],
@@ -446,14 +470,26 @@ export interface PluginConfig {
   filter?: (deps: IDependency[]) => IDependency[]; // 支持过滤能力
 }
 
+/**
+ * 插件工厂函数，用于创建BuilderComponentPlugin插件
+ *
+ * @param config 插件配置，可选
+ * @returns 返回创建的BuilderComponentPlugin插件
+ */
 const pluginFactory: BuilderComponentPluginFactory<PluginConfig> = (config?: PluginConfig) => {
+  //  合并配置
   const cfg = {
     fileType: FileType.JS,
     useAliasName: true,
     ...(config || {}),
   };
+  //cfg =  {
+  //   "fileType": "jsx",
+  //   "useAliasName": true
+  // }
 
   const plugin: BuilderComponentPlugin = async (pre: ICodeStruct) => {
+    // console.log(`pre==== ${JSON.stringify(pre, null, 2)}`);
     const next: ICodeStruct = {
       ...pre,
     };
@@ -461,6 +497,11 @@ const pluginFactory: BuilderComponentPluginFactory<PluginConfig> = (config?: Plu
     const ir = next.ir as IWithDependency;
 
     if (ir && ir.deps && ir.deps.length > 0) {
+      //  console.log(`cfg==== ${JSON.stringify(cfg, null, 2)}`);
+      //cfg =  {
+      //   "fileType": "jsx",
+      //   "useAliasName": true
+      // }
       const deps = cfg.filter ? cfg.filter(ir.deps) : ir.deps;
       const packs = groupDepsByPack(deps);
 
@@ -469,6 +510,7 @@ const pluginFactory: BuilderComponentPluginFactory<PluginConfig> = (config?: Plu
         next.chunks.push(...chunks);
       });
     }
+    // console.log(`next==== ${JSON.stringify(next, null, 2)}`);
 
     return next;
   };

@@ -42,12 +42,12 @@ export type ChunkContent = string | any;
 export type CodeGeneratorFunction<T> = (content: T) => string;
 
 export interface ICodeChunk {
-  type: ChunkType;
-  fileType: string;
-  name: string;
-  subModule?: string;
-  content: ChunkContent;
-  linkAfter: string[];
+  type: ChunkType; // 处理类型 ast | string | json
+  fileType: string; // 文件类型 js | css | ts ...
+  name: string; // 代码块名称，与 linkAfter 相关
+  subModule?: string; // 模块内文件名，默认是 index
+  content: ChunkContent; // 代码块内容，数据格式与 type 相关
+  linkAfter: string[]; // 描述应该跟在哪些 name 的代码块后面
   ext?: Record<string, unknown>;
 }
 
